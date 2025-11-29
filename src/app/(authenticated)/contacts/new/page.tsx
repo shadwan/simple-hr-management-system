@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { createContact } from "../actions";
-import { NotesInput } from "@/components/NotesSection";
+import { NotesInput, type NoteWithTimestamp } from "@/components/NotesSection";
 import type { Client } from "@/db/schema";
 
 export default function NewContactPage() {
-  const [notes, setNotes] = useState<string[]>([]);
+  const [notes, setNotes] = useState<NoteWithTimestamp[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
 
   useEffect(() => {

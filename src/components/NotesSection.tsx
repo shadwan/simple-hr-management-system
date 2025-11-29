@@ -94,17 +94,32 @@ export function NotesSection({ entityType, entityId, notes }: NotesSectionProps)
 }
 
 // Component for adding notes during entity creation
+export interface NoteWithTimestamp {
+  content: string;
+  createdAt: Date;
+}
+
 interface NotesInputProps {
-  notes: string[];
-  onChange: (notes: string[]) => void;
+  notes: NoteWithTimestamp[];
+  onChange: (notes: NoteWithTimestamp[]) => void;
 }
 
 export function NotesInput({ notes, onChange }: NotesInputProps) {
   const [currentNote, setCurrentNote] = useState("");
 
+  const formatDate = (date: Date) => {
+    return new Date(date).toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   const handleAddNote = () => {
     if (!currentNote.trim()) return;
-    onChange([...notes, currentNote.trim()]);
+    onChange([...notes, { content: currentNote.trim(), createdAt: new Date() }]);
     setCurrentNote("");
   };
 
@@ -128,7 +143,8 @@ export function NotesInput({ notes, onChange }: NotesInputProps) {
         <div className="space-y-2 mb-4">
           {notes.map((note, index) => (
             <div key={index} className="bg-gray-50 rounded-lg p-3 relative group">
-              <p className="text-gray-700 whitespace-pre-wrap pr-8">{note}</p>
+              <p className="text-gray-700 whitespace-pre-wrap pr-8">{note.content}</p>
+              <p className="text-xs text-gray-400 mt-2">{formatDate(note.createdAt)}</p>
               <button
                 type="button"
                 onClick={() => handleRemoveNote(index)}
@@ -165,7 +181,7 @@ export function NotesInput({ notes, onChange }: NotesInputProps) {
       
       {/* Hidden inputs to submit notes with form */}
       {notes.map((note, index) => (
-        <input key={index} type="hidden" name="notes" value={note} />
+        <input key={index} type="hidden" name="notes" value={note.content} />
       ))}
     </div>
   );

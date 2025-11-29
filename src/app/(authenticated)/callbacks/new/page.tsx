@@ -3,10 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { createCallback } from "../actions";
-import { NotesInput } from "@/components/NotesSection";
+import { NotesInput, type NoteWithTimestamp } from "@/components/NotesSection";
 
 export default function NewCallbackPage() {
-  const [notes, setNotes] = useState<string[]>([]);
+  const [notes, setNotes] = useState<NoteWithTimestamp[]>([]);
 
   return (
     <div>
