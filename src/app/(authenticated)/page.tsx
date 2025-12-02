@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import Link from "next/link";
 import { db } from "@/db";
 import { applicants, clients, contacts, missions, callbacks } from "@/db/schema";

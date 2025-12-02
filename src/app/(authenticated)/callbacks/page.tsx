@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import Link from "next/link";
 import { getCallbacks, deleteCallback } from "./actions";
 import { DeleteButton } from "@/components/DeleteButton";

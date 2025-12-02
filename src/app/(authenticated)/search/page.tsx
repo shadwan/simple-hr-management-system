@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import Link from "next/link";
 import { globalSearch, type SearchResults } from "./actions";
 import { Search, Users, Building2, UserCircle, Briefcase, Phone } from "lucide-react";

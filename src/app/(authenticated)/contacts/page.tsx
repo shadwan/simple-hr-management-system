@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import Link from "next/link";
 import { getContacts, deleteContact } from "./actions";
 import { StatusBadge } from "@/components/FormFields";
