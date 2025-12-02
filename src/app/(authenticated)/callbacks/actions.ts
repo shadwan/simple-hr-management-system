@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/db";
-import { callbacks, type NewCallback } from "@/db/schema";
+import { callbacks, applicants, contacts, type NewCallback } from "@/db/schema";
 import { eq, ilike, or, and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -25,26 +25,113 @@ export async function getCallbacks(search?: string, status?: string) {
     conditions.push(eq(callbacks.status, status));
   }
 
+  // Join with applicants and contacts to get their names
+  const baseQuery = db
+    .select({
+      id: callbacks.id,
+      name: callbacks.name,
+      company: callbacks.company,
+      phone: callbacks.phone,
+      email: callbacks.email,
+      reason: callbacks.reason,
+      notes: callbacks.notes,
+      callbackDate: callbacks.callbackDate,
+      status: callbacks.status,
+      applicantId: callbacks.applicantId,
+      contactId: callbacks.contactId,
+      createdAt: callbacks.createdAt,
+      updatedAt: callbacks.updatedAt,
+      applicantFirstName: applicants.firstName,
+      applicantLastName: applicants.lastName,
+      applicantPhone: applicants.phone,
+      contactFirstName: contacts.firstName,
+      contactLastName: contacts.lastName,
+      contactPhone: contacts.phone,
+    })
+    .from(callbacks)
+    .leftJoin(applicants, eq(callbacks.applicantId, applicants.id))
+    .leftJoin(contacts, eq(callbacks.contactId, contacts.id));
+
   if (conditions.length > 0) {
-    return db
-      .select()
-      .from(callbacks)
+    return baseQuery
       .where(and(...conditions))
       .orderBy(callbacks.callbackDate);
   }
 
-  return db.select().from(callbacks).orderBy(callbacks.callbackDate);
+  return baseQuery.orderBy(callbacks.callbackDate);
 }
 
 export async function getCallback(id: number) {
-  const result = await db.select().from(callbacks).where(eq(callbacks.id, id));
+  const result = await db
+    .select({
+      id: callbacks.id,
+      name: callbacks.name,
+      company: callbacks.company,
+      phone: callbacks.phone,
+      email: callbacks.email,
+      reason: callbacks.reason,
+      notes: callbacks.notes,
+      callbackDate: callbacks.callbackDate,
+      status: callbacks.status,
+      applicantId: callbacks.applicantId,
+      contactId: callbacks.contactId,
+      createdAt: callbacks.createdAt,
+      updatedAt: callbacks.updatedAt,
+      applicantFirstName: applicants.firstName,
+      applicantLastName: applicants.lastName,
+      applicantPhone: applicants.phone,
+      applicantEmail: applicants.email,
+      contactFirstName: contacts.firstName,
+      contactLastName: contacts.lastName,
+      contactPhone: contacts.phone,
+      contactEmail: contacts.email,
+    })
+    .from(callbacks)
+    .leftJoin(applicants, eq(callbacks.applicantId, applicants.id))
+    .leftJoin(contacts, eq(callbacks.contactId, contacts.id))
+    .where(eq(callbacks.id, id));
   return result[0] || null;
+}
+
+export async function getApplicantsForSelect() {
+  return db
+    .select({
+      id: applicants.id,
+      firstName: applicants.firstName,
+      lastName: applicants.lastName,
+      phone: applicants.phone,
+      email: applicants.email,
+    })
+    .from(applicants)
+    .where(eq(applicants.status, "active"))
+    .orderBy(applicants.lastName);
+}
+
+export async function getContactsForSelect() {
+  return db
+    .select({
+      id: contacts.id,
+      firstName: contacts.firstName,
+      lastName: contacts.lastName,
+      phone: contacts.phone,
+      email: contacts.email,
+    })
+    .from(contacts)
+    .where(eq(contacts.status, "active"))
+    .orderBy(contacts.lastName);
 }
 
 export async function createCallback(formData: FormData) {
   const callbackDateStr = formData.get("callbackDate") as string;
+  const applicantIdStr = formData.get("applicantId") as string;
+  const contactIdStr = formData.get("contactId") as string;
   
+  const applicantId = applicantIdStr ? parseInt(applicantIdStr) : null;
+  const contactId = contactIdStr ? parseInt(contactIdStr) : null;
+
   const data: NewCallback = {
+    applicantId,
+    contactId,
     name: formData.get("name") as string,
     company: formData.get("company") as string,
     phone: formData.get("phone") as string,
@@ -73,8 +160,15 @@ export async function updateCallback(id: number, formData: FormData) {
   if (!existing) throw new Error("Callback not found");
 
   const callbackDateStr = formData.get("callbackDate") as string;
+  const applicantIdStr = formData.get("applicantId") as string;
+  const contactIdStr = formData.get("contactId") as string;
+
+  const applicantId = applicantIdStr ? parseInt(applicantIdStr) : null;
+  const contactId = contactIdStr ? parseInt(contactIdStr) : null;
 
   await db.update(callbacks).set({
+    applicantId,
+    contactId,
     name: formData.get("name") as string,
     company: formData.get("company") as string,
     phone: formData.get("phone") as string,

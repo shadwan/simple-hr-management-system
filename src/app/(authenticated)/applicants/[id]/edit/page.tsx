@@ -125,7 +125,7 @@ export default async function EditApplicantPage({
               <div className="mb-4 p-3 bg-gray-50 rounded-lg">
                 <p className="text-sm text-gray-600 mb-2">Current CV: {applicant.cvFilename}</p>
                 <a
-                  href={`/uploads/${applicant.cvFilename}`}
+                  href={`/api/uploads/${applicant.cvFilename}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-600 hover:underline flex items-center gap-1"

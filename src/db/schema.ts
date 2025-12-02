@@ -110,6 +110,10 @@ export const notes = pgTable("notes", {
 // Callbacks table
 export const callbacks = pgTable("callbacks", {
   id: serial("id").primaryKey(),
+  // Link to applicant or contact (one or the other, or manual entry)
+  applicantId: integer("applicant_id").references(() => applicants.id, { onDelete: "set null" }),
+  contactId: integer("contact_id").references(() => contacts.id, { onDelete: "set null" }),
+  // Manual entry fields (used when no applicant/contact selected)
   name: varchar("name", { length: 255 }).notNull(),
   company: varchar("company", { length: 255 }),
   phone: varchar("phone", { length: 50 }),
@@ -128,11 +132,12 @@ export const clientsRelations = relations(clients, ({ many }) => ({
   missions: many(missions),
 }));
 
-export const contactsRelations = relations(contacts, ({ one }) => ({
+export const contactsRelations = relations(contacts, ({ one, many }) => ({
   client: one(clients, {
     fields: [contacts.clientId],
     references: [clients.id],
   }),
+  callbacks: many(callbacks),
 }));
 
 export const missionsRelations = relations(missions, ({ one, many }) => ({
@@ -145,6 +150,7 @@ export const missionsRelations = relations(missions, ({ one, many }) => ({
 
 export const applicantsRelations = relations(applicants, ({ many }) => ({
   missionApplicants: many(missionApplicants),
+  callbacks: many(callbacks),
 }));
 
 export const missionApplicantsRelations = relations(missionApplicants, ({ one }) => ({
@@ -155,6 +161,17 @@ export const missionApplicantsRelations = relations(missionApplicants, ({ one })
   applicant: one(applicants, {
     fields: [missionApplicants.applicantId],
     references: [applicants.id],
+  }),
+}));
+
+export const callbacksRelations = relations(callbacks, ({ one }) => ({
+  applicant: one(applicants, {
+    fields: [callbacks.applicantId],
+    references: [applicants.id],
+  }),
+  contact: one(contacts, {
+    fields: [callbacks.contactId],
+    references: [contacts.id],
   }),
 }));
 

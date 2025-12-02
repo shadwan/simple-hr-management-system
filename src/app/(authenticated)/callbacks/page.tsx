@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 import Link from "next/link";
 import { getCallbacks, deleteCallback } from "./actions";
 import { DeleteButton } from "@/components/DeleteButton";
-import { Pencil, Plus, Phone, Eye } from "lucide-react";
+import { Pencil, Plus, Phone, Eye, User, Users } from "lucide-react";
 
 function CallbackStatusBadge({ status }: { status: string }) {
   const styles = {
@@ -75,7 +75,7 @@ export default async function CallbacksPage({
           <thead>
             <tr>
               <th>Name</th>
-              <th>Company</th>
+              <th>Linked To</th>
               <th>Phone</th>
               <th>Reason</th>
               <th>Callback Date</th>
@@ -84,56 +84,83 @@ export default async function CallbacksPage({
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {callbacksList.map((callback) => (
-              <tr key={callback.id}>
-                <td className="font-medium">
-                  <Link href={`/callbacks/${callback.id}`} className="text-blue-600 hover:underline">
-                    {callback.name}
-                  </Link>
-                </td>
-                <td>{callback.company || "-"}</td>
-                <td>
-                  {callback.phone ? (
-                    <a href={`tel:${callback.phone}`} className="text-blue-600 hover:underline flex items-center gap-1">
-                      <Phone className="w-3 h-3" />
-                      {callback.phone}
-                    </a>
-                  ) : (
-                    "-"
-                  )}
-                </td>
-                <td className="max-w-xs truncate">{callback.reason || "-"}</td>
-                <td>{formatDate(callback.callbackDate)}</td>
-                <td>
-                  <CallbackStatusBadge status={callback.status} />
-                </td>
-                <td>
-                  <div className="flex gap-2">
-                    <Link
-                      href={`/callbacks/${callback.id}`}
-                      className="text-gray-600 hover:text-gray-800"
-                      title="View"
-                    >
-                      <Eye className="w-4 h-4" />
+            {callbacksList.map((callback) => {
+              const linkedToApplicant = callback.applicantId && callback.applicantFirstName;
+              const linkedToContact = callback.contactId && callback.contactFirstName;
+              
+              return (
+                <tr key={callback.id}>
+                  <td className="font-medium">
+                    <Link href={`/callbacks/${callback.id}`} className="text-blue-600 hover:underline">
+                      {callback.name}
                     </Link>
-                    <Link
-                      href={`/callbacks/${callback.id}/edit`}
-                      className="text-blue-600 hover:text-blue-800"
-                      title="Edit"
-                    >
-                      <Pencil className="w-4 h-4" />
-                    </Link>
-                    <DeleteButton
-                      action={async () => {
-                        "use server";
-                        await deleteCallback(callback.id);
-                      }}
-                      confirmMessage="Are you sure you want to delete this callback?"
-                    />
-                  </div>
-                </td>
-              </tr>
-            ))}
+                  </td>
+                  <td>
+                    {linkedToApplicant && (
+                      <Link
+                        href={`/applicants/${callback.applicantId}`}
+                        className="text-blue-600 hover:underline flex items-center gap-1"
+                      >
+                        <User className="w-3 h-3" />
+                        {callback.applicantFirstName} {callback.applicantLastName}
+                      </Link>
+                    )}
+                    {linkedToContact && (
+                      <Link
+                        href={`/contacts/${callback.contactId}`}
+                        className="text-purple-600 hover:underline flex items-center gap-1"
+                      >
+                        <Users className="w-3 h-3" />
+                        {callback.contactFirstName} {callback.contactLastName}
+                      </Link>
+                    )}
+                    {!linkedToApplicant && !linkedToContact && (
+                      <span className="text-gray-400">-</span>
+                    )}
+                  </td>
+                  <td>
+                    {callback.phone ? (
+                      <a href={`tel:${callback.phone}`} className="text-blue-600 hover:underline flex items-center gap-1">
+                        <Phone className="w-3 h-3" />
+                        {callback.phone}
+                      </a>
+                    ) : (
+                      "-"
+                    )}
+                  </td>
+                  <td className="max-w-xs truncate">{callback.reason || "-"}</td>
+                  <td>{formatDate(callback.callbackDate)}</td>
+                  <td>
+                    <CallbackStatusBadge status={callback.status} />
+                  </td>
+                  <td>
+                    <div className="flex gap-2">
+                      <Link
+                        href={`/callbacks/${callback.id}`}
+                        className="text-gray-600 hover:text-gray-800"
+                        title="View"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Link>
+                      <Link
+                        href={`/callbacks/${callback.id}/edit`}
+                        className="text-blue-600 hover:text-blue-800"
+                        title="Edit"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </Link>
+                      <DeleteButton
+                        action={async () => {
+                          "use server";
+                          await deleteCallback(callback.id);
+                        }}
+                        confirmMessage="Are you sure you want to delete this callback?"
+                      />
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
             {callbacksList.length === 0 && (
               <tr>
                 <td colSpan={7} className="text-center py-8 text-gray-500">

@@ -6,7 +6,7 @@ import { getCallback } from "../actions";
 import { getNotes } from "../../notes/actions";
 import { StatusBadge } from "@/components/FormFields";
 import { NotesSection } from "@/components/NotesSection";
-import { Pencil, ArrowLeft, Phone, Mail, Calendar } from "lucide-react";
+import { Pencil, ArrowLeft, Phone, Mail, Calendar, User, Users } from "lucide-react";
 
 function formatDate(date: Date | null) {
   if (!date) return "-";
@@ -32,6 +32,10 @@ export default async function ViewCallbackPage({
 
   const notesList = await getNotes("callback", callback.id);
 
+  // Determine linked entity info
+  const linkedToApplicant = callback.applicantId && callback.applicantFirstName;
+  const linkedToContact = callback.contactId && callback.contactFirstName;
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -54,6 +58,32 @@ export default async function ViewCallbackPage({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Info */}
         <div className="lg:col-span-2 space-y-6">
+          {/* Linked Entity Card */}
+          {(linkedToApplicant || linkedToContact) && (
+            <div className="card bg-blue-50 border-blue-200">
+              <h2 className="text-lg font-semibold mb-4 border-b border-blue-200 pb-2 flex items-center gap-2">
+                {linkedToApplicant ? <User className="w-5 h-5 text-blue-600" /> : <Users className="w-5 h-5 text-purple-600" />}
+                Linked {linkedToApplicant ? "Applicant" : "Contact"}
+              </h2>
+              {linkedToApplicant && (
+                <Link
+                  href={`/applicants/${callback.applicantId}`}
+                  className="text-blue-600 hover:underline font-medium text-lg"
+                >
+                  {callback.applicantFirstName} {callback.applicantLastName}
+                </Link>
+              )}
+              {linkedToContact && (
+                <Link
+                  href={`/contacts/${callback.contactId}`}
+                  className="text-purple-600 hover:underline font-medium text-lg"
+                >
+                  {callback.contactFirstName} {callback.contactLastName}
+                </Link>
+              )}
+            </div>
+          )}
+
           <div className="card">
             <h2 className="text-lg font-semibold mb-4 border-b pb-2">Contact Information</h2>
             <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">

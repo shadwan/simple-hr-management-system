@@ -70,7 +70,7 @@ export default async function ApplicantsPage({
                 <td>
                   {applicant.cvFilename && (
                     <a
-                      href={`/uploads/${applicant.cvFilename}`}
+                      href={`/api/uploads/${applicant.cvFilename}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:underline flex items-center gap-1"

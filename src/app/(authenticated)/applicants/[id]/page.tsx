@@ -150,7 +150,7 @@ export default async function ViewApplicantPage({
                 <div className="p-3 bg-gray-50 rounded-lg">
                   <p className="text-sm text-gray-600 mb-2">{applicant.cvFilename}</p>
                   <a
-                    href={`/uploads/${applicant.cvFilename}`}
+                    href={`/api/uploads/${applicant.cvFilename}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn btn-primary text-sm flex items-center gap-2 w-full justify-center"
@@ -167,7 +167,7 @@ export default async function ViewApplicantPage({
                 <div className="p-3 bg-gray-50 rounded-lg">
                   <p className="text-sm text-gray-600 mb-2">{applicant.extraFilename}</p>
                   <a
-                    href={`/uploads/${applicant.extraFilename}`}
+                    href={`/api/uploads/${applicant.extraFilename}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn btn-secondary text-sm flex items-center gap-2 w-full justify-center"
