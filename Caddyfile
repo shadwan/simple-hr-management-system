@@ -1,0 +1,3 @@
+hr.png-consultancy.be {
+    reverse_proxy app:3000
+}
